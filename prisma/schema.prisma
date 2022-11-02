@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Badge {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  used          Boolean  @default(false)
+  type          Int
+  discordId     String
+  distributorId String?
+  classId       Int?
+  note          String?
+  Class         Class?   @relation(fields: [classId], references: [id])
+}
+
+model Class {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  name         String
+  description  String
+  creatorId    String
+  threadId     String
+  active       Boolean  @default(true)
+  participants User[]
+  badges       Badge[]
+  fee          Int      @default(0)
+  roleId       String?
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  discordId String
+  createdAt DateTime @default(now())
+  classId   Int?
+  Class     Class?   @relation(fields: [classId], references: [id])
+}
+
+model Campaign {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  endsAt      DateTime
+  active      Boolean  @default(true)
+  name        String
+  description String
+  creatorId   String
+  channelId   String
+  Bids        Bid[]
+}
+
+model Bid {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  discordId  String
+  message    String
+  amount     Int
+  campaignId Int
+  refunded   Float  @default(0)
+  Campaign   Campaign @relation(fields: [campaignId], references: [id])
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  discordId String
+  amount    Int
+  message   String
+  isSelect  Boolean  @default(false)
+  answerNum Int      @default(0)
+  isDelete  Boolean  @default(false)
+}
+
+model Answer {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  discordId  String
+  questionId Int
+  message    String
+}
+
